@@ -1,104 +1,23 @@
-import React, {useState, useRef} from 'react';
+import React from 'react';
 import {View, Text} from 'react-native';
 import {styles} from '../theme/appTheme';
 import {BtnCalc} from '../components/BtnCalc';
-
-enum Operators {
-  add,
-  sub,
-  mul,
-  div,
-}
+import {useCalc} from '../hooks/useCalc';
 
 export const CalcScreen = () => {
-  const [number, setNumber] = useState('0');
-  const [prevNumber, setPrevNumber] = useState('0');
-
-  const lastOperation = useRef<Operators>('');
-
-  const clean = () => {
-    setNumber('0');
-    setPrevNumber('0');
-  };
-
-  const makeNumber = (numText: string) => {
-    if (number.includes('.') && numText === '.') {
-      return;
-    }
-
-    if (number.startsWith('0') || number.startsWith('-0')) {
-      //decimal
-      if (numText === '.') {
-        setNumber(number + numText);
-        //eval if another 0 && .
-      } else if (numText === '0' && number.includes('.')) {
-        setNumber(number + numText);
-        //eval if != 0 && ! .
-      } else if (numText !== '0' && !number.includes('.')) {
-        setNumber(numText);
-      } else if (numText === '0' && !number.includes('.')) {
-        setNumber(number);
-      } else {
-        setNumber(number);
-      }
-    } else {
-      setNumber(number + numText);
-    }
-  };
-
-  const posNeg = () => {
-    if (number.includes('-')) {
-      setNumber(number.replace('-', ''));
-    } else {
-      setNumber('-' + number);
-    }
-  };
-
-  const del = () => {
-    let neg = '';
-    let tempNum = number;
-
-    if (number.includes('-')) {
-      neg = '-';
-      tempNum = number.substr(1);
-    }
-
-    if (tempNum.length > 1) {
-      setNumber(neg + number.slice(0, -1));
-    } else {
-      setNumber('0');
-    }
-  };
-
-  const changeToPrevNum = () => {
-    if (number.endsWith('.')) {
-      setPrevNumber(number.slice(0, -1));
-    } else {
-      setPrevNumber(number);
-    }
-
-    setNumber('0');
-  };
-
-  const btnDiv = () => {
-    changeToPrevNum();
-    lastOperation.current = Operators.div;
-  };
-
-  const btnMul = () => {
-    changeToPrevNum();
-    lastOperation.current = Operators.mul;
-  };
-
-  const btnAdd = () => {
-    changeToPrevNum();
-    lastOperation.current = Operators.add;
-  };
-
-  const btnSub = () => {
-    changeToPrevNum();
-    lastOperation.current = Operators.sub;
-  };
+  const {
+    clean,
+    makeNumber,
+    posNeg,
+    del,
+    btnDiv,
+    btnMul,
+    btnAdd,
+    btnSub,
+    calc,
+    number,
+    prevNumber,
+  } = useCalc();
 
   return (
     <View style={styles.calcContainer}>
@@ -138,7 +57,7 @@ export const CalcScreen = () => {
       <View style={styles.row}>
         <BtnCalc text="0" wide action={makeNumber} />
         <BtnCalc text="." action={makeNumber} />
-        <BtnCalc color="#FF9427" text="=" action={changeToPrevNum} />
+        <BtnCalc color="#FF9427" text="=" action={calc} />
       </View>
     </View>
   );
